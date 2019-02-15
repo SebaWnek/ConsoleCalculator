@@ -22,12 +22,12 @@ namespace ConsoleApp12
 
             //create quee and rearrange tokens into reversed polish notation
             Queue<Token> tokensAfter = new Queue<Token>(ShuntingYard(tokens));
-            
-            //show RPN
-            foreach (Token t in tokensAfter)
-            {
-                Console.Write(t.GetSign);
-            }
+
+            ////show RPN // disabled
+            //foreach (Token t in tokensAfter)
+            //{
+            //    Console.Write(t.GetSign);
+            //}
 
             //final calculation
             double result = CalculateExpression(tokensAfter);
@@ -44,6 +44,8 @@ namespace ConsoleApp12
             eq = eq.Replace("/", " / ");
             eq = eq.Replace(")", " ) ");
             eq = eq.Replace("(", " ( ");
+            eq = eq.Replace("^", " ^ ");
+            eq = eq.Replace("sqrt", " sqrt ");
             //remove excess spaces
             eq = eq.Replace("  ", " ");
             //trim spaces at begiinng and end
@@ -177,6 +179,9 @@ namespace ConsoleApp12
                         case "/":
                             resultTmp = op1 / op2;
                             break;
+                        case "^":
+                            resultTmp = Math.Pow(op1, op2);
+                            break;
                     }
                     awaiting.Push(resultTmp);
                 }
@@ -189,6 +194,9 @@ namespace ConsoleApp12
                     {
                         case "_":
                             resultTmp = -op1;
+                            break;
+                        case "sqrt":
+                            resultTmp = Math.Sqrt(op1);
                             break;
                     }
                     awaiting.Push(resultTmp);
@@ -204,7 +212,7 @@ namespace ConsoleApp12
         double value = 0;
         int numberOfParams = 2;
         int precedence = 10;
-        char symbol = ' ';
+        string symbol = " ";
         public enum Associativity { left, right };
         Associativity assoc = Associativity.left;
         public enum Type { number, oper, leftBra, rightBra, notAToken }
@@ -270,53 +278,69 @@ namespace ConsoleApp12
             }
             else if (num == "+")
             {
-                t.symbol = '+';
+                t.symbol = "+";
                 t.precedence = 10;
                 t.typeOf = Type.oper;
                 return t;
             }
             else if (num == "-")
             {
-                t.symbol = '-';
+                t.symbol = "-";
                 t.precedence = 10;
                 t.typeOf = Type.oper;
                 return t;
             }
             else if (num == "*")
             {
-                t.symbol = '*';
+                t.symbol = "*";
                 t.precedence = 20;
                 t.typeOf = Type.oper;
                 return t;
             }
             else if (num == "/")
             {
-                t.symbol = '/';
+                t.symbol = "/";
                 t.precedence = 20;
                 t.typeOf = Type.oper;
                 return t;
             }
             else if (num == "(")
             {
-                t.symbol = '(';
+                t.symbol = "(";
                 t.precedence = 30;
                 t.typeOf = Type.leftBra;
                 return t;
             }
             else if (num == ")")
             {
-                t.symbol = ')';
+                t.symbol = ")";
                 t.precedence = 30;
                 t.typeOf = Type.rightBra;
                 return t;
             }
             else if (num == "_")
             {
-                t.symbol = '_';
+                t.symbol = "_";
                 t.precedence = 40;
                 t.typeOf = Type.oper;
                 t.numberOfParams = 1;
                 t.assoc = Associativity.right;
+                return t;
+            }
+            else if (num == "sqrt")
+            {
+                t.symbol = "sqrt";
+                t.precedence = 25;
+                t.typeOf = Type.oper;
+                t.numberOfParams = 1;
+                t.assoc = Associativity.right;
+                return t;
+            }
+            else if (num == "^")
+            {
+                t.symbol = "^";
+                t.precedence = 25;
+                t.typeOf = Type.oper;
                 return t;
             }
             //if unknown operator
