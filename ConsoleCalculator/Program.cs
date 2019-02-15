@@ -45,6 +45,7 @@ namespace ConsoleApp12
             eq = eq.Replace(")", " ) ");
             eq = eq.Replace("(", " ( ");
             eq = eq.Replace("^", " ^ ");
+            eq = eq.Replace("!", " ! ");
             eq = eq.Replace("sqrt", " sqrt ");
             //remove excess spaces
             eq = eq.Replace("  ", " ");
@@ -198,6 +199,13 @@ namespace ConsoleApp12
                         case "sqrt":
                             resultTmp = Math.Sqrt(op1);
                             break;
+                        case "!":
+                            resultTmp = 1;
+                            for (int i = 1; i <= op1; i++)
+                            {
+                                resultTmp *= i;
+                            }
+                            break;
                     }
                     awaiting.Push(resultTmp);
                 }
@@ -334,6 +342,15 @@ namespace ConsoleApp12
                 t.typeOf = Type.oper;
                 t.numberOfParams = 1;
                 t.assoc = Associativity.right;
+                return t;
+            }
+            else if (num == "!")
+            {
+                t.symbol = "!";
+                t.precedence = 25;
+                t.typeOf = Type.oper;
+                t.numberOfParams = 1;
+                t.assoc = Associativity.left;
                 return t;
             }
             else if (num == "^")
