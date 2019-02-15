@@ -28,6 +28,11 @@ namespace ConsoleApp12
             {
                 Console.Write(t.GetSign);
             }
+
+            //final calculation
+            double result = CalculateExpression(tokensAfter);
+
+            Console.WriteLine($"result is {result}");
         }
 
         static string[] Rearange(string eq)
@@ -137,6 +142,60 @@ namespace ConsoleApp12
             }
             return output;
         }
+
+        //calculatin result from RPN
+        public static double CalculateExpression(Queue<Token> queue)
+        {
+            //stack for result
+            Stack<double> awaiting = new Stack<double>();
+            while (queue.Count > 0)
+            {
+                //check if operand or operator, operand push to stack, operator perform
+                if (queue.Peek().GetTokenType == Token.Type.number)
+                {
+                    awaiting.Push(double.Parse(queue.Dequeue().GetSign));
+                }
+                //check if operator using 2 operands
+                else if (queue.Peek().GetTokenType == Token.Type.oper && queue.Peek().NumberOfParams == 2)
+                {
+                    double op2 = awaiting.Pop();
+                    double op1 = awaiting.Pop();
+                    double resultTmp = 0;
+
+                    //different cases
+                    switch (queue.Dequeue().GetSign)
+                    {
+                        case "-":
+                            resultTmp = op1 - op2;
+                            break;
+                        case "+":
+                            resultTmp = op1 + op2;
+                            break;
+                        case "*":
+                            resultTmp = op1 * op2;
+                            break;
+                        case "/":
+                            resultTmp = op1 / op2;
+                            break;
+                    }
+                    awaiting.Push(resultTmp);
+                }
+                //if operator with one parameter
+                else if (queue.Peek().GetTokenType == Token.Type.oper && queue.Peek().NumberOfParams == 1)
+                {
+                    double op1 = awaiting.Pop();
+                    double resultTmp = 0;
+                    switch (queue.Dequeue().GetSign)
+                    {
+                        case "_":
+                            resultTmp = -op1;
+                            break;
+                    }
+                    awaiting.Push(resultTmp);
+                }
+            }
+            return awaiting.Pop();
+        }
     }
 
     public class Token
@@ -165,6 +224,14 @@ namespace ConsoleApp12
                 {
                     return symbol.ToString();
                 }
+            }
+        }
+
+        public int NumberOfParams
+        {
+            get
+            {
+                return numberOfParams;
             }
         }
 
